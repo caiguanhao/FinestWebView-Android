@@ -158,6 +158,7 @@ public class FinestWebView {
     protected Boolean webViewOffscreenPreRaster;
 
     protected String injectJavaScript;
+    protected String closeUrl;
 
     protected String mimeType;
     protected String encoding;
@@ -890,6 +891,11 @@ public class FinestWebView {
 
     public Builder injectJavaScript(String injectJavaScript) {
       this.injectJavaScript = injectJavaScript;
+      return this;
+    }
+
+    public Builder closeUrl(String closeUrl) {
+      this.closeUrl = closeUrl;
       return this;
     }
 

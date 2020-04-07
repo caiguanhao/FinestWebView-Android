@@ -34,6 +34,8 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.webkit.DownloadListener;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -189,6 +191,7 @@ public class FinestWebViewActivity extends AppCompatActivity
   protected Boolean webViewOffscreenPreRaster;
 
   protected String injectJavaScript;
+  protected String closeUrl;
 
   protected String mimeType;
   protected String encoding;
@@ -430,6 +433,7 @@ public class FinestWebViewActivity extends AppCompatActivity
     webViewOffscreenPreRaster = builder.webViewOffscreenPreRaster;
 
     injectJavaScript = builder.injectJavaScript;
+    closeUrl = builder.closeUrl;
 
     mimeType = builder.mimeType;
     encoding = builder.encoding;
@@ -1333,6 +1337,37 @@ public class FinestWebViewActivity extends AppCompatActivity
       } else {
         return super.shouldOverrideUrlLoading(view, url);
       }
+    }
+
+    @Override
+    public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+      boolean handled = false;
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        handled = handleError(request.getUrl().toString());
+      }
+      if (handled) {
+          view.loadUrl("about:blank");
+      } else {
+          super.onReceivedError(view, request, error);
+      }
+    }
+
+    @Override
+    public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+      boolean handled = handleError(failingUrl);
+      if (handled) {
+          view.loadUrl("about:blank");
+      } else {
+          super.onReceivedError(view, errorCode, description, failingUrl);
+      }
+    }
+
+    private boolean handleError(String url) {
+      if (url.equals(closeUrl)) {
+        finish();
+        return true;
+      }
+      return false;
     }
 
     @Override
