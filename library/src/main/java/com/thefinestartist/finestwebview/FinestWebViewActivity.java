@@ -57,6 +57,8 @@ import com.thefinestartist.utils.service.ClipboardManagerUtil;
 import com.thefinestartist.utils.ui.DisplayUtil;
 import com.thefinestartist.utils.ui.ViewUtil;
 
+import java.net.URISyntaxException;
+
 //MailTo Imports
 
 /**
@@ -1318,6 +1320,16 @@ public class FinestWebViewActivity extends AppCompatActivity
         startActivity(emailIntent);
 
         return true;
+      } else if (url.startsWith("intent:")) {
+        try {
+          Intent intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
+          if (intent != null) {
+            String fallback = intent.getStringExtra("browser_fallback_url");
+            view.loadUrl(fallback);
+            return true;
+          }
+        } catch (URISyntaxException e) {}
+        return super.shouldOverrideUrlLoading(view, url);
       } else {
         return super.shouldOverrideUrlLoading(view, url);
       }
